@@ -29,11 +29,6 @@
                                  (edges graph)))
   graph)
 
-(defun edge-eql (a b)
-  (or (equal a b)
-      (equal (cons (cdr a) (car a))
-             b)))
-
 (defun add-edge (graph x y)
   "Adds an edge from X to Y in GRAPH."
   (pushnew (cons x y) (edges graph) :test #'equal)
@@ -66,4 +61,6 @@
     (setf (get-edge-value) value)))
 |#
 (defun make-graph (&key vertices edges)
+  "Creates a new directed graph object. VERTICES should be a list of vertices
+unique under EQUAL. EDGES should be an alist of objects in VERTICES."
   (make-instance 'graph :vertices vertices :edges edges))

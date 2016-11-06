@@ -1,4 +1,4 @@
-cl-directed-graph
+CL-DIRECTED-GRAPH
 =================
 
-Directed graph data structure in Common Lisp
+CL-DIRECTED-GRAPH is a simple implementation of the directed graph data structure in Common Lisp.

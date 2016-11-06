@@ -1,44 +1,28 @@
-(in-package #:cl-graph)
+(in-package #:cl-directed-graph)
 
 (defclass graph ()
   ((vertices :accessor vertices :initarg :vertices)
    (edges    :accessor edges    :initarg :edges)))
 
-(defclass directed-graph (graph) ())
+(defun adjacent (graph x y)
+  "Tests whether GRAPH contains an edge from X to Y."
+  (aif (member (cons x y) (edges graph) :test #'equal)
+       it nil))
 
-(macrolet ((mem (x y) `(member (cons ,x ,y) (edges graph) :test #'equalp))
-           (aif-test (test)
-             `(aif ,test (values it t) (values nil nil))))
-  (defgeneric adjacent (graph x y)
-    (:documentation
-     "Tests whether GRAPH contains an edge from X to Y and returns it.")
-    (:method ((graph directed-graph) x y)
-      (aif-test (mem x y)))
-    (:method ((graph graph) x y)
-      (aif-test (or (mem x y) (mem y x))))))
-
-(macrolet ((mem (v key)
-             `(member ,v (edges graph) :key ,key :test #'equalp)))
-  (defgeneric neighbors (graph vertex)
-    (:documentation
-     "Returns a list of all vertices where there is an edge from VERTEX.")
-    (:method ((graph directed-graph) vertex)
-      (remove-if-not (lambda (v)
-                       (mem v #'car))
-                     (vertices graph)))
-    (:method ((graph graph) vertex)
-      (remove-if-not (lambda (v)
-                       (or (mem v #'car) (mem v #'cdr)))
-                     (vertices graph)))))
+(defun neighbors (graph vertex)
+  "Returns a list of all vertices in GRAPH where there is an edge from VERTEX."
+  (loop :for x :in (vertices graph)
+     :when (equalp vertex (rassoc-value (edges graph) x :test #'equal))
+     :collect x))
 
 (defun add-vertex (graph vertex)
   "Adds VERTEX to GRAPH."
-  (pushnew vertex (vertices graph) :test #'equalp)
+  (pushnew vertex (vertices graph) :test #'equal)
   graph)
 
 (defun remove-vertex (graph vertex)
   "Removes VERTEX from GRAPH."
-  (setf (vertices graph) (remove vertex (vertices graph) :test #'equalp)
+  (setf (vertices graph) (remove vertex (vertices graph) :test #'equal)
         (edges graph) (remove-if (lambda (x)
                                    (or (equalp (car x) vertex)
                                        (equalp (cdr x) vertex)))
@@ -50,27 +34,16 @@
       (equal (cons (cdr a) (car a))
              b)))
 
-(defgeneric add-edge (graph x y)
-  (:documentation "Adds an edge from X to Y to GRAPH.")
-  (:method ((graph directed-graph) x y)
-    (pushnew (cons x y) (edges graph) :test #'equal)
-    graph)
-  (:method ((graph graph) x y)
-    (pushnew (cons x y) (edges graph) :test #'edge-eql)
-    graph))
+(defun add-edge (graph x y)
+  "Adds an edge from X to Y in GRAPH."
+  (pushnew (cons x y) (edges graph) :test #'equal)
+  graph)
 
-(macrolet ((rem-edge (test)
-             `(setf (edges graph)
-                    (remove (cons x y) (edges graph) :test ,test))))
-  (defgeneric remove-edge (graph x y)
-    (:documentation "Removes an edge from X to Y from GRAPH.")
-    (:method ((graph directed-graph) x y)
-      (rem-edge #'equal)
-      graph)
-    (:method ((graph graph) x y)
-      (rem-edge #'edge-eql)
-      graph)))
-
+(defun rem-edge (graph x y)
+  "Removes the edge from X to Y in GRAPH."
+  (setf (edges graph) (remove (cons x y) (edges graph) :test #'equal))
+  graph)
+#| TODO
 (macrolet ((get-vertex-value ()
              '(value-of-vertex (assoc-value vertex (vertices graph)))))
   
@@ -91,7 +64,7 @@
 
   (defun (setf edge-value) (graph x y value)
     (setf (get-edge-value) value)))
-
+|#
 (defun make-graph (&key vertices edges (directed t))
   (make-instance (if directed 'directed-graph 'undirected-graph)
                  :vertices vertices :edges edges))

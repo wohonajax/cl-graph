@@ -1,8 +1,8 @@
 (in-package #:cl-user)
 
-(defpackage #:cl-graph
+(defpackage #:cl-directed-graph
   (:use #:cl)
-  (:import-from #:alexandria #:assoc-value)
+  (:import-from #:alexandria #:assoc-value #:rassoc-value)
   (:import-from #:anaphora #:it #:aif)
   (:export #:make-graph
            #:adjacent
@@ -11,9 +11,4 @@
            #:remove-vertex
            #:add-edge
            #:remove-edge
-           #:vertex-value
-           #:edge-value
-           #:graph
-           #:directed-graph
-           #:vertex
-           #:directed-vertex))
+           #:graph))

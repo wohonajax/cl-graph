@@ -22,7 +22,7 @@
 
 (defun neighbors (graph vertex)
   "Returns a list of all vertices in GRAPH where there is an edge from VERTEX."
-  (gethash vertex (edges graph)))
+  (values (gethash vertex (edges graph))))
 
 (defun add-vertex (graph vertex)
   "Adds VERTEX to GRAPH."
@@ -46,7 +46,7 @@
   (pushqual y (gethash x (edges graph)))
   graph)
 
-(defun rem-edge (graph x y)
+(defun remove-edge (graph x y)
   "Removes the edge from X to Y in GRAPH."
   (setf (gethash x (edges graph))
         (remqual y (gethash x (edges graph))))
@@ -77,8 +77,9 @@
   "Creates a new directed graph object. VERTICES should be a list of vertices
 unique under EQUAL. EDGES should be a hash table whose keys are objects in
 VERTICES and whose values are lists of vertices."
-  (maphash (lambda (k v)
-             (assert (and (memqual k vertices)
-                          (mapc (lambda (x) (memqual x vertices)) v))))
-           edges)
+  (when edges
+    (maphash (lambda (k v)
+               (assert (and (memqual k vertices)
+                            (mapc (lambda (x) (memqual x vertices)) v))))
+             edges))
   (make-instance 'graph :vertices vertices :edges edges))

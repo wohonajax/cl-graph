@@ -65,6 +65,5 @@
   (defun (setf edge-value) (graph x y value)
     (setf (get-edge-value) value)))
 |#
-(defun make-graph (&key vertices edges (directed t))
-  (make-instance (if directed 'directed-graph 'undirected-graph)
-                 :vertices vertices :edges edges))
+(defun make-graph (&key vertices edges)
+  (make-instance 'graph :vertices vertices :edges edges))

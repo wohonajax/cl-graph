@@ -1,5 +1,11 @@
 (in-package #:cl-graph)
 
+(defclass graph ()
+  ((vertices :accessor vertices :initarg :vertices)
+   (edges    :accessor edges    :initarg :edges)))
+
+(defclass directed-graph (graph) ())
+
 (macrolet ((mem (x y) `(member (cons ,x ,y) (edges graph) :test #'equalp))
            (aif-test (test)
              `(aif ,test (values it t) (values nil nil))))

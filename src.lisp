@@ -1,42 +1,55 @@
 (in-package #:cl-directed-graph)
 
+(macrolet ((qual (fun)
+             `(,fun object list :test #'equal)))
+  (defun memqual (object list)
+    (qual member))
+
+  (defun remqual (object list)
+    (qual remove))
+
+  (defun pushqual (object list)
+    (qual pushnew)))
+
 (defclass graph ()
   ((vertices :accessor vertices :initarg :vertices)
    (edges    :accessor edges    :initarg :edges)))
 
 (defun adjacent (graph x y)
   "Tests whether GRAPH contains an edge from X to Y."
-  (aif (member (cons x y) (edges graph) :test #'equal)
-       it nil))
+  (if (memqual y (gethash x (edges graph)))
+      t nil))
 
 (defun neighbors (graph vertex)
   "Returns a list of all vertices in GRAPH where there is an edge from VERTEX."
-  (loop :for x :in (vertices graph)
-     :when (equalp vertex (rassoc-value (edges graph) x :test #'equal))
-     :collect x))
+  (gethash vertex (edges graph)))
 
 (defun add-vertex (graph vertex)
   "Adds VERTEX to GRAPH."
-  (pushnew vertex (vertices graph) :test #'equal)
+  (pushqual vertex (vertices graph))
   graph)
 
 (defun remove-vertex (graph vertex)
   "Removes VERTEX from GRAPH."
-  (setf (vertices graph) (remove vertex (vertices graph) :test #'equal)
-        (edges graph) (remove-if (lambda (x)
-                                   (or (equalp (car x) vertex)
-                                       (equalp (cdr x) vertex)))
-                                 (edges graph)))
+  (setf (vertices graph) (remqual vertex (vertices graph)))
+  (let ((edges (edges graph)))
+    (maphash (lambda (k v)
+               (cond ((equal k vertex) (remhash k (edges graph)))
+                     ((memqual vertex v)
+                      (setf (gethash k edges) (remqual vertex v)))
+                     (t)))
+             edges))
   graph)
 
 (defun add-edge (graph x y)
   "Adds an edge from X to Y in GRAPH."
-  (pushnew (cons x y) (edges graph) :test #'equal)
+  (pushqual y (gethash x (edges graph)))
   graph)
 
 (defun rem-edge (graph x y)
   "Removes the edge from X to Y in GRAPH."
-  (setf (edges graph) (remove (cons x y) (edges graph) :test #'equal))
+  (setf (gethash x (edges graph))
+        (remqual y (gethash x (edges graph))))
   graph)
 #| TODO
 (macrolet ((get-vertex-value ()
@@ -62,5 +75,10 @@
 |#
 (defun make-graph (&key vertices edges)
   "Creates a new directed graph object. VERTICES should be a list of vertices
-unique under EQUAL. EDGES should be an alist of objects in VERTICES."
+unique under EQUAL. EDGES should be a hash table whose keys are objects in
+VERTICES and whose values are lists of vertices."
+  (maphash (lambda (k v)
+             (assert (and (memqual k vertices)
+                          (mapc (lambda (x) (memqual x vertices)) v))))
+           edges)
   (make-instance 'graph :vertices vertices :edges edges))

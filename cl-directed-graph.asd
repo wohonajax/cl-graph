@@ -5,5 +5,5 @@
   :description "Directed graph data structure"
   :serial t
   :components ((:file "package")
-               (:file "graph"))
+               (:file "src"))
   :depends-on (alexandria anaphora))

@@ -1,4 +1,4 @@
-(asdf:defsystem #:cl-graph
+(asdf:defsystem #:cl-directed-graph
   :name "cl-directed-graph"
   :author "Hunter Chandler <wohonajax@gmail.com>"
   :license "MIT"

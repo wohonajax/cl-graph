@@ -73,8 +73,10 @@ VERTICES and whose values are lists of vertices."
   (when edges
     (maphash (lambda (k v)
                (assert (and (member k vertices :test #'equal)
-                            (mapc (lambda (x) (member x vertices :test #'equal)) v))))
+                            (mapc (lambda (x) (member x vertices :test #'equal))
+                                  v))))
              edges))
-  (make-instance 'graph :vertices vertices :edges edges))
+  (make-instance 'graph :vertices vertices
+                 :edges (if edges edges (make-hash-table :test #'equal))))
 
 ;;; TRAVERSAL

@@ -80,3 +80,17 @@ VERTICES and whose values are lists of vertices."
                  :edges (if edges edges (make-hash-table :test #'equal))))
 
 ;;; TRAVERSAL
+
+(defun map-vertices (function graph)
+  "Returns a list of the results of calling FUNCTION with each vertex of GRAPH."
+  (mapcar function (vertices graph)))
+
+(defun map-edges (function graph)
+  "Returns a list of the results of calling FUNCTION on each edge of GRAPH.
+FUNCTION should take 2 arguments: the starting and ending vertices of an edge."
+  (lret ((result (list)))
+    (maphash (lambda (k v)
+               (mapc (lambda (x)
+                       (push (funcall function k x) result))
+                     v))
+             (edges graph))))

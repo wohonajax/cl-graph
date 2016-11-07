@@ -2,6 +2,7 @@
 
 (defpackage #:cl-directed-graph
   (:use #:cl)
+  (:import-from #:serapeum #:lret)
   (:export #:make-graph
            #:adjacent
            #:neighbors
@@ -9,4 +10,7 @@
            #:remove-vertex
            #:add-edge
            #:remove-edge
-           #:graph))
+           #:graph
+           ;; traversal functions
+           #:map-vertices
+           #:map-edges))

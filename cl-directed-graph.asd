@@ -6,4 +6,5 @@
   :description "Directed graph data structure"
   :serial t
   :components ((:file "package")
-               (:file "src")))
+               (:file "src"))
+  :depends-on (serapeum))

@@ -13,4 +13,6 @@
            #:graph
            ;; traversal functions
            #:map-vertices
-           #:map-edges))
+           #:map-edges
+           #:map-depth-first
+           #:map-breadth-first))

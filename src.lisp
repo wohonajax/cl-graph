@@ -88,12 +88,13 @@ VERTICES and whose values are lists of vertices."
 (defun map-edges (function graph)
   "Returns a list of the results of calling FUNCTION on each edge of GRAPH.
 FUNCTION should take 2 arguments: the starting and ending vertices of an edge."
-  (lret ((result (list)))
+  (let ((result (list)))
     (maphash (lambda (k v)
                (mapc (lambda (x)
                        (push (funcall function k x) result))
                      v))
-             (edges graph))))
+             (edges graph))
+    result))
 ;;; BUG: ordered mapping causes an infinite loop on cycles
 (defmacro traverse (&body body)
   `(progn (cond ((member vertex seen :test #'equal))
